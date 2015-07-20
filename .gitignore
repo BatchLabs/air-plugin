@@ -1,0 +1,16 @@
+bin
+gen
+.DS_Store
+.settings
+local.properties
+out
+build
+.gradle
+doc
+target
+*.swf
+doc
+build.config
+temp
+bin-debug
+xcuserdata

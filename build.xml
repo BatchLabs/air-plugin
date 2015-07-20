@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Air Native Extension Build Scripts" default="all">
+
+    <!-- Config -->
+    <property file="build.config"/>
+
+    <!-- All -->
+    <target name="all" depends="ios,android,stub,swc,package,packagegps,clear" description="Full build of extension"/>
+
+    <!-- iOS -->
+    <target name="ios" description="Build iOS Library">
+        <mkdir dir="temp/ios/"/>
+
+        <exec executable="xcodebuild" failonerror="true" dir="iosExtension/">
+            <arg line="-project ane-ios.xcodeproj"/>
+            <arg line="-alltargets clean"/>
+        </exec>
+
+        <exec executable="xcodebuild" failonerror="true" dir="iosExtension/">
+            <arg line="-project ane-ios.xcodeproj"/>
+            <arg line="-sdk ${ios.sdkversion}"/>
+            <arg line="-target ane-ios"/>
+            <arg line="-configuration Release"/>
+        </exec>
+
+        <copy file="iosExtension/libane-ios.a" todir="temp/ios" overwrite="true"/>
+
+        <copy todir="temp/Batch.framework" overwrite="true">
+            <fileset dir="include/Batch.framework"/>
+        </copy>
+
+        <copy todir="temp/ios/Batch.bundle" overwrite="true">
+            <fileset dir="include/Batch.bundle"/>
+        </copy>
+    </target>
+
+
+    <!-- Android -->
+    <target name="android" description="Build Android Library">
+        <delete dir="androidExtension/temp"/>
+        <mkdir dir="androidExtension/temp/classes"/>
+
+        <echo message="Using Java version ${ant.java.version}."/>
+
+        <javac source="1.6" target="1.6" includeantruntime="false" srcdir="androidExtension/src" destdir="androidExtension/temp/classes">
+            <classpath>
+                <pathelement location="${android.sdk}/android.jar"/>
+                <pathelement location="${flex.sdk}/lib/android/FlashRuntimeExtensions.jar"/>
+                <pathelement location="${flex.sdk}/lib/android/lib/runtimeClasses.jar"/>
+                <pathelement location="include/Batch/libs/batch.jar"/>
+            </classpath>
+        </javac>
+
+        <mkdir dir="temp/android/"/>
+        <copy file="include/Batch/libs/batch.jar" todir="temp/android" overwrite="true"/>
+
+        <jar basedir="androidExtension/temp/classes" destfile="temp/android/androidane.jar"/>
+        <delete dir="androidExtension/temp"/>
+
+        <copy todir="temp/android/batch-res">
+            <fileset dir="include/Batch/res"/>
+        </copy>
+    </target>
+
+    <!-- Actionscript -->
+    <target name="stub" description="Build Stub SWC library">
+        <mkdir dir="temp/stub/content/"/>
+
+        <fileset dir="stubLibrary/src" casesensitive="yes" id="classfiles">
+            <include name="**/*.as"/>
+        </fileset>
+
+        <pathconvert property="classlist" refid="classfiles" pathsep=" " dirsep=".">
+            <regexpmapper from=".*src.(.*)\.as" to="\1"/>
+        </pathconvert>
+
+        <exec executable="${flex.sdk}/bin/compc${bin.ext}" failonerror="true">
+            <env key="AIR_SDK_HOME" value="${flex.sdk}"/>
+            <arg line='-source-path stubLibrary/src'/>
+            <arg line='-output temp/stub/content/Batch-LibraryStub.swc'/>
+            <arg line='-swf-version=23'/>
+            <arg line='-external-library-path+="${flex.sdk}/frameworks/libs/air/airglobal.swc"'/>
+            <arg line='-include-classes ${classlist}'/>
+        </exec>
+
+        <unzip src="temp/stub/content/Batch-LibraryStub.swc" dest="temp/stub/content" overwrite="true"/>
+
+        <copy file="temp/stub/content/library.swf" todir="temp/stub" overwrite="true"/>
+        <delete dir="temp/stub/content"/>
+    </target>
+
+    <target name="swc" description="Build SWC library">
+        <mkdir dir="temp/swc/content/"/>
+
+        <fileset dir="lib/src" casesensitive="yes" id="classfiles">
+            <include name="**/*.as"/>
+        </fileset>
+
+        <pathconvert property="classlist" refid="classfiles" pathsep=" " dirsep=".">
+            <regexpmapper from=".*src.(.*)\.as" to="\1"/>
+        </pathconvert>
+
+        <exec executable="${flex.sdk}/bin/compc${bin.ext}" failonerror="true">
+            <env key="AIR_SDK_HOME" value="${flex.sdk}"/>
+            <arg line='-source-path lib/src'/>
+            <arg line='-output temp/swc/Batch-Library.swc'/>
+            <arg line='-swf-version=23'/>
+            <arg line='-external-library-path+="${flex.sdk}/frameworks/libs/air/airglobal.swc"'/>
+            <arg line='-include-classes ${classlist}'/>
+        </exec>
+
+        <unzip src="temp/swc/Batch-Library.swc" dest="temp/swc/content" overwrite="true"/>
+
+        <copy file="temp/swc/content/library.swf" todir="temp/ios" overwrite="true"/>
+        <copy file="temp/swc/content/library.swf" todir="temp/android" overwrite="true"/>
+
+        <delete dir="temp/swc/content"/>
+    </target>
+
+    <!-- Package -->
+    <target name="package" description="Create the extension package">
+        <exec executable="${flex.sdk}/bin/adt${bin.ext}" failonerror="true" dir="temp">
+            <arg value="-package"/>
+            <arg value="-target"/>
+            <arg value="ane"/>
+            <arg value="Batch-ANE.ane"/>
+            <arg value="../lib/src/extension.xml"/>
+            <arg line="-swc swc/Batch-Library.swc"/>
+            <arg line="-platform iPhone-ARM -platformoptions ../iosExtension/ios.xml Batch.framework -C ios/ ."/>
+            <arg line="-platform Android-ARM -platformoptions ../androidExtension/android.xml -C android/ ."/>
+            <arg line="-platform Android-x86 -platformoptions ../androidExtension/android.xml -C android/ ."/>
+            <arg line="-platform default -C stub/ ."/>
+        </exec>
+
+        <move file="temp/Batch-ANE.ane" todir="." overwrite="true" />
+    </target>
+
+    <target name="packagegps" description="Create the extension package with Google Play Services">
+        <copy file="include/google-play-services_lib/libs/google-play-services.jar" todir="temp/android" overwrite="true"/>
+        <copy file="include/android-support-v4.jar" todir="temp/android" overwrite="true"/>
+
+        <copy todir="temp/android/google-play-services-res">
+            <fileset dir="include/google-play-services_lib/res"/>
+        </copy>
+
+        <exec executable="${flex.sdk}/bin/adt${bin.ext}" failonerror="true" dir="temp">
+            <arg value="-package"/>
+            <arg value="-target"/>
+            <arg value="ane"/>
+            <arg value="Batch-ANE-GPS.ane"/>
+            <arg value="../lib/src/extension.xml"/>
+            <arg line="-swc swc/Batch-Library.swc"/>
+            <arg line="-platform iPhone-ARM -platformoptions ../iosExtension/ios.xml Batch.framework -C ios/ ."/>
+            <arg line="-platform Android-ARM -platformoptions ../androidExtension/androidgps.xml -C android/ ."/>
+            <arg line="-platform Android-x86 -platformoptions ../androidExtension/androidgps.xml -C android/ ."/>
+            <arg line="-platform default -C stub/ ."/>
+        </exec>
+
+        <move file="temp/Batch-ANE-GPS.ane" todir="." overwrite="true" />
+    </target>
+
+    <!-- Clear -->
+    <target name="clear" description="Clear temp dir">
+        <delete dir="temp"/>
+    </target>
+
+    <!-- HTML Documentation (must be run manually) -->
+    <target name="asdoc" description="generate the asdoc in readable html">
+        <delete dir="doc"/>
+        
+        <exec executable="${flex.sdk}/bin/asdoc${bin.ext}" failonerror="true">
+            <env key="FLEX_HOME" value="${flex.sdk}"/>
+            <env key="FALCON_HOME" value="${flex.sdk}"/>
+            <arg line='-doc-sources lib/src'/>
+            <arg line='-output doc'/>
+            <arg line='-library-path+="${flex.sdk}/frameworks/libs/air/airglobal.swc"'/>
+        </exec>
+    </target>
+
+</project>

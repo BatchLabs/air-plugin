@@ -1,0 +1,14 @@
+<platform xmlns="http://ns.adobe.com/air/extension/4.0">
+    <sdkVersion>5.0</sdkVersion>
+    <linkerOptions>
+        <option>-ios_version_min 6.0</option>
+        <option>-framework CoreTelephony</option>
+        <option>-framework Security</option>
+        <option>-framework Accelerate</option>
+        <option>-framework CoreText</option>
+        <option>-framework AdSupport</option>
+    </linkerOptions>
+    <packagedDependencies> 
+        <packagedDependency>Batch.framework</packagedDependency> 
+    </packagedDependencies> 
+</platform>

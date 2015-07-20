@@ -1,0 +1,11 @@
+<platform xmlns="http://ns.adobe.com/air/extension/4.0">
+    <packagedDependencies> 
+        <packagedDependency>batch.jar</packagedDependency>
+    </packagedDependencies>
+    <packagedResources> 
+        <packagedResource> 
+            <packageName>com.batch.android</packageName> 
+            <folderName>batch-res</folderName> 
+        </packagedResource>
+    </packagedResources>
+</platform>

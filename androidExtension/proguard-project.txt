@@ -1,0 +1,43 @@
+-injars      androidane.jar
+-outjars     androidane.pg.jar
+-printmapping  mapping.map
+-libraryjars <android.sdk>/platforms/android-19/android.jar
+-libraryjars /Applications/Adobe Flash Builder 4.7/sdks/4.6.0/lib/android/FlashRuntimeExtensions.jar
+-dontshrink
+-dontnote com.batch.android.GooglePlayServicesHelper**
+
+-keepparameternames
+-renamesourcefileattribute SourceFile
+-keepattributes Exceptions,InnerClasses,Signature,Deprecated,
+                SourceFile,LineNumberTable,*Annotation*,EnclosingMethod
+                
+-keep class com.batch.ane.** {
+	*;
+}
+
+-keep public class com.batch.android.* {
+	public *;
+}
+
+-keepclassmembernames class * {
+    java.lang.Class class$(java.lang.String);
+    java.lang.Class class$(java.lang.String, boolean);
+}
+
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+-keepclassmembers class * implements java.io.Serializable {
+    static final long serialVersionUID;
+    private static final java.io.ObjectStreamField[] serialPersistentFields;
+    private void writeObject(java.io.ObjectOutputStream);
+    private void readObject(java.io.ObjectInputStream);
+    java.lang.Object writeReplace();
+    java.lang.Object readResolve();
+}

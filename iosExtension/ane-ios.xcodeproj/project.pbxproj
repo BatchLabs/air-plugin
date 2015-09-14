@@ -352,8 +352,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					"/Users/benoit/Git/KDS/wrappers/air-plugin",
-					"/Users/benoit/Git/KDS/wrappers/air-plugin/include",
+					"$(PROJECT_DIR)/../include/**",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ane-ios/ane-ios-Prefix.pch";
@@ -377,8 +376,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					"/Users/benoit/Git/KDS/wrappers/air-plugin",
-					"/Users/benoit/Git/KDS/wrappers/air-plugin/include",
+					"$(PROJECT_DIR)/../include/**",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ane-ios/ane-ios-Prefix.pch";

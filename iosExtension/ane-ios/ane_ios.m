@@ -17,7 +17,7 @@ Config *_config = NULL;
 // Staticaly retained delegate (to avoid ARC to kill it)
 BAUnlockDelegate *_delegate;
 
-const NSString *pluginVersion = @"1.3.2";
+const NSString *pluginVersion = @"1.4";
 
 // Function called to set-up SDK
 FREObject create(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])

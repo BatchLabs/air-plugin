@@ -14,7 +14,7 @@ public class Extension implements FREExtension
 	/**
 	 * Version of the plugin
 	 */
-	private static final String PLUGIN_VERSION = "1.3.2";
+	private static final String PLUGIN_VERSION = "1.4";
 	
 	/**
 	 * Log tag for error logs of this extension
